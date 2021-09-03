@@ -10,7 +10,7 @@ def get_cdc():
     secrets = json.load(open("secrets.json", "r"))
     client = Socrata("chronicdata.cdc.gov",
                      secrets["cdc_app_token"],
-                     userame=secrets["socrata_username"],
+                     username=secrets["socrata_username"],
                      password=secrets["socrata_password"])
 
     # source: https://chronicdata.cdc.gov/Behavioral-Risk-Factors/Behavioral-Risk-Factor-Surveillance-System-BRFSS-H/iuq5-y9ct
@@ -48,17 +48,17 @@ def get_cdc():
     # source: https://chronicdata.cdc.gov/Behavioral-Risk-Factors/Behavioral-Risk-Factors-Selected-Metropolitan-Area/at7e-uhkc
     results = client.get("at7e-uhkc")
     smart_age_2011_to_present_df = pd.DataFrame.from_records(results)
-    return (
-        historical_questions_df,
-        prevalence_data_df,
-        smart_2011_to_present_df,
-        smart_2010_and_prior_df,
-        smart_county_df,
-        age_prevalence_2011_to_present_df,
-        prevalence_2010_and_prior_df
-        smart_county_2010_and_prior_df,
-        smart_age_2011_to_present_df
-    )
+    return {
+        "historical_questions.csv": historical_questions_df,
+        "prevalence_data.csv": prevalence_data_df,
+        "smart_2011_to_present.csv": smart_2011_to_present_df,
+        "smart_2010_and_prior.csv": smart_2010_and_prior_df,
+        "smart_county": smart_county_df,
+        "age_prevalence_2011_to_present.csv": age_prevalence_2011_to_present_df,
+        "prevalence_2021_and_prior.csv": prevalence_2010_and_prior_df,
+        "smart_county_2010_and_prior.csv": smart_county_2010_and_prior_df,
+        "smart_age_2011_to_present.csv": smart_age_2011_to_present_df
+    }
         
 def get_file(url, filename):
     r = requests.get(url, stream=True)
@@ -124,7 +124,7 @@ def healthdata_gov():
     secrets = json.load(open("secrets.json", "r"))
     client = Socrata("chronicdata.cdc.gov",
                      secrets["cdc_app_token"],
-                     userame=secrets["socrata_username"],
+                     username=secrets["socrata_username"],
                      password=secrets["socrata_password"])
 
     # source: https://healthdata.gov/dataset/Screened-in-and-Screened-out-Referrals/k5kg-jgj9
@@ -179,7 +179,26 @@ def healthdata_gov():
     results = client.get("rnkf-8dm6")
     community_vulnerability_crosswalk_by_rank_order_score_df = pd.DataFrame.from_records(results)
 
+    return {
+        "child_protective_services.csv": child_protective_services_df,
+        "relationship_to_victim.csv": relationship_to_victim_df,
+        "perpetrator_trends.csv": perpetrator_trends_df,
+        "maltreatment_victims.csv": maltreatment_victims_df,
+        "child_abuse.csv": child_abuse_df,
+        "child_abuse_investigation.csv": child_abuse_investigation_df,
+        "child_abuse_by_age.csv": child_abuse_by_age_df,
+        "child_abuse_by_trend.csv": child_abuse_by_trend_df,
+        "child_fatalities.csv": child_fatalities_df,
+        "child_fatalities_trend.csv": child_fatalities_trend_df,
+        "hhs_id.csv": hhs_id_df,
+        "community_vulnerability_crosswalk_census_tract.csv": community_vulnerability_crosswalk_census_tract_df,
+        "community_vulnerability_crosswalk_by_rank_order_score.csv": community_vulnerability_crosswalk_by_rank_order_score_df
+    }
     
     
 if __name__ == '__main__':
-    get_cdc()
+    dicter = get_cdc()
+    [dicter[key].to_csv(key, index=False) for key in dicter]
+    dicter = healthdata_gov()
+    [dicter[key].to_csv(key, index=False) for key in dicter]
+    get_hrsa()
