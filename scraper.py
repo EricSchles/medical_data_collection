@@ -122,7 +122,7 @@ def epa_data():
 
 def healthdata_gov():
     secrets = json.load(open("secrets.json", "r"))
-    client = Socrata("chronicdata.cdc.gov",
+    client = Socrata("healthdata.gov",
                      secrets["cdc_app_token"],
                      username=secrets["socrata_username"],
                      password=secrets["socrata_password"])
@@ -197,8 +197,8 @@ def healthdata_gov():
     
     
 if __name__ == '__main__':
-    dicter = get_cdc()
-    [dicter[key].to_csv(key, index=False) for key in dicter]
+    #dicter = get_cdc()
+    #[dicter[key].to_csv(key, index=False) for key in dicter]
     dicter = healthdata_gov()
     [dicter[key].to_csv(key, index=False) for key in dicter]
     get_hrsa()
